@@ -23,7 +23,7 @@ IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **i
 }
 IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff) {
 	printf(" == 'WAVE'; Microsoft (WAV) sound.\n");
-        MicrosoftWave ioWave;
+	MicrosoftWave ioWave;
 	IoRet ioRet;
 	ioRet = fread(&ioWave, sizeof(ioWave), 1, io);
 	if(-1 == ioRet) {
@@ -55,7 +55,7 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 }
 IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	printf(" == 'RIFF'; Microsoft RIFF.");
-        MicrosoftRiff ioRiff;
+	MicrosoftRiff ioRiff;
 	IoRet ioRet;
 	ioRet = fread(&ioRiff, sizeof(ioRiff), 1, io);
 	if(-1 == ioRet) {
@@ -109,7 +109,7 @@ IoRet main(int argc, char **argv) {
 	}
 	IoSz inputSz = ioSz(io);
 	printf(", %u == sz", inputSz);
-        IoHead inputHead;
+	IoHead inputHead;
 	IoRet ioRet = fread(&inputHead, sizeof(inputHead), 1, io);
 	fseek(io, 0L, SEEK_SET);
 	if(-1 == ioRet) {
