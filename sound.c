@@ -10,13 +10,13 @@ IoSz ioSz(FILE *io) {
 	return inputSz;
 }
 IoRet headerPCM(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
-	printf(" %u == wave.Subchunk2Size, ", ioWave->pcm.Subchunk2Size);
-	if(subchunk1SizePCM !=  ioWave->Subchunk1Size) {
-		printf("\n%u == wave.Subchunk1ID, should == 16 for PCM.\n", ioWave->Subchunk1Size);
+	printf(" %u == wave.subchunk2Size, ", ioWave->pcm.subchunk2Size);
+	if(subchunk1SizePCM !=  ioWave->subchunk1Size) {
+		printf("\n%u == wave.subchunk1ID, should == 16 for PCM.\n", ioWave->subchunk1Size);
 		return -1;
 	}
-	if(subchunk2ID != ioWave->pcm.Subchunk2ID) {
-		printf("\n%x == wave.Subchunk2ID, should == 'data'.\n", ioWave->pcm.Subchunk2ID);
+	if(subchunk2ID != ioWave->pcm.subchunk2ID) {
+		printf("\n%x == wave.subchunk2ID, should == 'data'.\n", ioWave->pcm.subchunk2ID);
 		return -1;
 	}
 	return 0;
@@ -30,25 +30,25 @@ IoRet headerWAVE(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 		printf("\n-1 == fread(&ioWave, sizeof(ioWave), 1, %p)\n", io);
 		return -1;
 	}
-	if(subchunk1ID !=  ioWave.Subchunk1ID) {
-		printf("\n%x == wave.Subchunk1ID, should == 'fmt '.\n", ioWave.Subchunk1ID);
+	if(subchunk1ID !=  ioWave.subchunk1ID) {
+		printf("\n%x == wave.subchunk1ID, should == 'fmt '.\n", ioWave.subchunk1ID);
 		return -1;
 	}
-	printf("%u == wave.Subchunk1Size", ioWave.Subchunk1Size);
-	/*printf(" %u == wave.AudioFormat", ioWave.AudioFormat);*/
-	printf(", %u == wave.NumChannels", ioWave.NumChannels);
-	printf(", %u == wave.SampleRate", ioWave.SampleRate);
-	printf(", %u == wave.ByteRate", ioWave.ByteRate);
-	printf(", %u == wave.BlockAlign", ioWave.BlockAlign);
-	printf(", %u == wave.BitsPerSample", ioWave.BitsPerSample);
-	printf(", %u == wave.AudioFormat", ioWave.AudioFormat);
-	switch(ioWave.AudioFormat) {
-	case MicrosoftAudioPCM:
+	printf("%u == wave.subchunk1Size", ioWave.subchunk1Size);
+	/*printf(" %u == wave.audioFormat", ioWave.audioFormat);*/
+	printf(", %u == wave.numChannels", ioWave.numChannels);
+	printf(", %u == wave.sampleRate", ioWave.sampleRate);
+	printf(", %u == wave.byteRate", ioWave.byteRate);
+	printf(", %u == wave.blockAlign", ioWave.blockAlign);
+	printf(", %u == wave.bitsPerSample", ioWave.bitsPerSample);
+	printf(", %u == wave.audioFormat", ioWave.audioFormat);
+	switch(ioWave.audioFormat) {
+	case microsoftAudioPCM:
 		printf("; PCM.");
 		return headerPCM(io, inputSz, &ioWave, inputBuff);
 	default:
 		printf("; unknown.");
-		printf(" %u == wave.ExtraParamSize, ", ioWave.ExtraParamSize);
+		printf(" %u == wave.extraParamSize, ", ioWave.extraParamSize);
 		return -1;
 	}
 	return 0;
@@ -57,7 +57,7 @@ IoRet headerRIFF(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	printf(" == 'RIFF'; Microsoft RIFF.");
         MicrosoftRiff ioRiff;
 	IoRet ioRet;
-	ioRet = fread(&ioRiff, sizeof(MicrosoftRiff), 1, io);
+	ioRet = fread(&ioRiff, sizeof(ioRiff), 1, io);
 	if(-1 == ioRet) {
 		printf("\n-1 == fread(&ioRiff, sizeof(ioRiff), 1, %p)\n", io);
 		return -1;

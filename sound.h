@@ -29,26 +29,26 @@ typedef enum Subchunk1Size : uint32_t {
 	subchunk1SizePCM = 16
 } Subchunk1Size;
 typedef enum MicrosoftAudio : uint16_t {
-	MicrosoftAudioPCM = 1
+	microsoftAudioPCM = 1
 } MicrosoftAudio;
 typedef enum Subchunk2ID : uint32_t {
 	subchunk2ID = 'atad'		/*'data'*/
 } Subchunk2ID;
 typedef struct MicrosoftPCM {
-	Subchunk2ID Subchunk2ID;	/*'data'*/
-	uint32_t Subchunk2Size;
+	Subchunk2ID subchunk2ID;	/*'data'*/
+	uint32_t subchunk2Size;
 } MicrosoftPCM;
 typedef struct MicrosoftWave {
-	Subchunk1ID Subchunk1ID;	/*'fmt '*/
-	uint32_t Subchunk1Size;
-	MicrosoftAudio AudioFormat;
-	uint16_t NumChannels;
-	uint32_t SampleRate;
-	uint32_t ByteRate;
-	uint16_t BlockAlign;
-	uint16_t BitsPerSample;
+	Subchunk1ID subchunk1ID;	/*'fmt '*/
+	uint32_t subchunk1Size;
+	MicrosoftAudio audioFormat;
+	uint16_t numChannels;
+	uint32_t sampleRate;
+	uint32_t byteRate;
+	uint16_t blockAlign;
+	uint16_t bitsPerSample;
 	union {
-		uint16_t ExtraParamSize;	/*+ char [ExtraParamSize]ExtraParams, not for PCM*/
+		uint16_t extraParamSize;	/*+ char [ExtraParamSize]ExtraParams, not for PCM*/
 		MicrosoftPCM pcm;
 	};
 } MicrosoftWave;
