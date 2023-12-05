@@ -1,7 +1,7 @@
 #include <stdio.h> /*size_t FILE fopen fclose fseek ftell fread*/
 #include <stdlib.h> /*malloc free*/
 #include <ctype.h> /*uint16_t uint32_t*/
-#include "sound.h" /*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSize MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
+#include "sound.h" /*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
 /*static char *input = "input.wav";*/
 IoSz ioSz(FILE *io) {
 	fseek(io, 0L, SEEK_END);
@@ -10,9 +10,9 @@ IoSz ioSz(FILE *io) {
 	return inputSz;
 }
 IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
-	printf(" %u == wave.subchunk2Size, ", ioWave->pcm.subchunk2Size);
-	if(subchunkSizePcm !=  ioWave->subchunk1Size) {
-		printf("\n%u == wave.subchunk1Id, should == 16 for PCM.\n", ioWave->subchunk1Size);
+	printf(" %u == wave.subchunk2Sz, ", ioWave->pcm.subchunk2Sz);
+	if(subchunkSzPcm !=  ioWave->subchunk1Sz) {
+		printf("\n%u == wave.subchunk1Id, should == 16 for PCM.\n", ioWave->subchunk1Sz);
 		return -1;
 	}
 	if(subchunkIdPcm != ioWave->pcm.subchunk2Id) {
@@ -34,11 +34,11 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 		printf("\n%x == wave.subchunk1Id, should == 'fmt '.\n", ioWave.subchunk1Id);
 		return -1;
 	}
-	printf("%u == wave.subchunk1Size", ioWave.subchunk1Size);
+	printf("%u == wave.subchunk1Sz", ioWave.subchunk1Sz);
 	/*printf(" %u == wave.AudioFormat", ioWave.audioFormat);*/
 	printf(", %u == wave.numChannels", ioWave.numChannels);
-	printf(", %u == wave.sampleRate", ioWave.sampleRate);
-	printf(", %u == wave.byteRate", ioWave.byteRate);
+	printf(", %u == wave.samplePs", ioWave.samplePs);
+	printf(", %u == wave.bytePs", ioWave.bytePs);
 	printf(", %u == wave.blockAlign", ioWave.blockAlign);
 	printf(", %u == wave.bitsPerSample", ioWave.bitsPerSample);
 	printf(", %u == wave.audioFormat", ioWave.audioFormat);
@@ -48,7 +48,7 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 		return headerPcm(io, inputSz, &ioWave, inputBuff);
 	default:
 		printf("; unknown.");
-		printf(" %u == wave.extraParamSize, ", ioWave.extraParamSize);
+		printf(" %u == wave.extraParamSz, ", ioWave.extraParamSz);
 		return -1;
 	}
 	return 0;
