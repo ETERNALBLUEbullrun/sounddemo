@@ -11,36 +11,34 @@ typedef unsigned IoSz;
 typedef int IoRet;
 typedef uint32_t IoHead;
 typedef enum IoHeader : uint32_t {
-	ioHeaderRIFF = 'FFIR',		/*'RIFF'*/
-	ioHeaderRIFX = 'RIFX'		/*'RIFX' big-endian*/
+	ioHeaderRiff = 'FFIR',		/*'RIFF'*/
+	ioHeaderRifx = 'RIFX'		/*'RIFX' big-endian*/
 } IoHeader;
 typedef enum RiffFormat : uint32_t {
-	riffFormatWAVE = 'EVAW'		/*'WAVE'*/
+	riffFormatWave = 'EVAW'		/*'WAVE'*/
 } RiffFormat;
 typedef struct MicrosoftRiff {
 	IoHeader header;		/*'RIFF'*/
 	uint32_t chunkSz;
 	RiffFormat format;		/*'WAVE'*/
 } MicrosoftRiff;
-typedef enum Subchunk1ID : uint32_t {
-	subchunk1ID = ' tmf'		/*'fmt '*/
-} Subchunk1ID;
-typedef enum Subchunk1Size : uint32_t {
-	subchunk1SizePCM = 16
-} Subchunk1Size;
+typedef enum SubchunkId : uint32_t {
+	subchunkIdWave = ' tmf',	/*'fmt '*/
+	subchunkIdPcm = 'atad'		/*'data'*/
+} SubchunkId;
+typedef enum SubchunkSize : uint32_t {
+	subchunkSizePcm = 16
+} SubchunkSize;
 typedef enum MicrosoftAudio : uint16_t {
-	microsoftAudioPCM = 1
+	microsoftAudioPcm = 1
 } MicrosoftAudio;
-typedef enum Subchunk2ID : uint32_t {
-	subchunk2ID = 'atad'		/*'data'*/
-} Subchunk2ID;
-typedef struct MicrosoftPCM {
-	Subchunk2ID subchunk2ID;	/*'data'*/
-	uint32_t subchunk2Size;
-} MicrosoftPCM;
+typedef struct MicrosoftPcm {
+	SubchunkId subchunk2Id;		/*'data'*/
+	SubchunkSize subchunk2Size;
+} MicrosoftPcm;
 typedef struct MicrosoftWave {
-	Subchunk1ID subchunk1ID;	/*'fmt '*/
-	uint32_t subchunk1Size;
+	SubchunkId subchunk1Id;		/*'fmt '*/
+	SubchunkSize subchunk1Size;
 	MicrosoftAudio audioFormat;
 	uint16_t numChannels;
 	uint32_t sampleRate;
@@ -49,13 +47,13 @@ typedef struct MicrosoftWave {
 	uint16_t bitsPerSample;
 	union {
 		uint16_t extraParamSize;	/*+ char [ExtraParamSize]ExtraParams, not for PCM*/
-		MicrosoftPCM pcm;
+		MicrosoftPcm pcm;
 	};
 } MicrosoftWave;
 IoSz ioSz(FILE *io);
-IoRet headerPCM(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
-IoRet headerWAVE(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
-IoRet headerRIFF(FILE *io, IoSz inputSz, uint8_t **inputBuff);
-IoRet headerRIFX(FILE *io, IoSz inputSz, uint8_t **inputBuff);
+IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
+IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
+IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff);
+IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff);
 IoRet main(int argc, char **argv);
 
