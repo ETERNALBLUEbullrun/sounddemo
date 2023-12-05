@@ -1,17 +1,28 @@
-#include <stdio.h> /*FILE fopen fclose fseek ftell fread*/
-#include <malloc.h> /*malloc free*/
-//#include <types.h>
-#include "sound.h" /*ioSz headerWAVE headerRIFF*/
-//static char *input = "input.wav";
+#include <stdio.h> /*size_t FILE fopen fclose fseek ftell fread*/
+#include <stdlib.h> /*malloc free*/
+#include <ctype.h> /*uint16_t uint32_t*/
+#include "sound.h" /*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff Subchunk1ID Subchunk1Size Subchunk2ID MicrosoftPCM MicrosoftWAVE ioSz headerPCM headerWAVE headerRIFF headerRIFX*/
+/*static char *input = "input.wav";*/
 IoSz ioSz(FILE *io) {
 	fseek(io, 0L, SEEK_END);
 	IoSz inputSz = ftell(io);
 	fseek(io, 0L, SEEK_SET);
 	return inputSz;
 }
-IoRet headerWAVE(FILE *io, IoSz inputSz, MicrosoftRiff *ioRiff, uint8_t **inputBuff) {
+IoRet headerPCM(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
+	printf(" %u == wave.Subchunk2Size, ", ioWave->pcm.Subchunk2Size);
+	if(subchunk1SizePCM !=  ioWave->Subchunk1Size) {
+		printf("\n%u == wave.Subchunk1ID, should == 16 for PCM.\n", ioWave->Subchunk1Size);
+		return -1;
+	}
+	if(subchunk2ID != ioWave->pcm.Subchunk2ID) {
+		printf("\n%x == wave.Subchunk2ID, should == 'data'.\n", ioWave->pcm.Subchunk2ID);
+		return -1;
+	}
+	return 0;
+}
+IoRet headerWAVE(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff) {
 	printf(" == 'WAVE'; Microsoft (WAV) sound.\n");
-	MicrosoftAudio AudioFormat;
         MicrosoftWave ioWave;
 	IoRet ioRet;
 	ioRet = fread(&ioWave, sizeof(ioWave), 1, io);
@@ -20,34 +31,25 @@ IoRet headerWAVE(FILE *io, IoSz inputSz, MicrosoftRiff *ioRiff, uint8_t **inputB
 		return -1;
 	}
 	if(subchunk1ID !=  ioWave.Subchunk1ID) {
-		printf("\n%x == wave.Subchunk1ID, should == 'fmt '\n", ioWave.Subchunk1ID);
+		printf("\n%x == wave.Subchunk1ID, should == 'fmt '.\n", ioWave.Subchunk1ID);
 		return -1;
 	}
-	printf(" %u == wave.Subchunk1Size, ", ioWave.Subchunk1Size);
-	printf(" %u == wave.AudioFormat", ioWave.AudioFormat);
+	printf("%u == wave.Subchunk1Size", ioWave.Subchunk1Size);
+	/*printf(" %u == wave.AudioFormat", ioWave.AudioFormat);*/
+	printf(", %u == wave.NumChannels", ioWave.NumChannels);
+	printf(", %u == wave.SampleRate", ioWave.SampleRate);
+	printf(", %u == wave.ByteRate", ioWave.ByteRate);
+	printf(", %u == wave.BlockAlign", ioWave.BlockAlign);
+	printf(", %u == wave.BitsPerSample", ioWave.BitsPerSample);
+	printf(", %u == wave.AudioFormat", ioWave.AudioFormat);
 	switch(ioWave.AudioFormat) {
 	case MicrosoftAudioPCM:
 		printf("; PCM.");
-		break;
+		return headerPCM(io, inputSz, &ioWave, inputBuff);
 	default:
 		printf("; unknown.");
-		return -1;
-	}
-	printf(" %u == wave.NumChannels, ", ioWave.NumChannels);
-	printf(" %u == wave.SampleRate, ", ioWave.SampleRate);
-	printf(" %u == wave.ByteRate, ", ioWave.ByteRate);
-	printf(" %u == wave.BlockAlign, ", ioWave.BlockAlign);
-	printf(" %u == wave.BitsPerSample, ", ioWave.BitsPerSample);
-	switch(ioWave.AudioFormat) {
-	case MicrosoftAudioPCM:
-		if(subchunk2ID !=  ioWave.pcm.Subchunk2ID) {
-			printf("\n%x == wave.Subchunk2ID, should == 'data'\n", ioWave.pcm.Subchunk2ID);
-			return -1;
-		}
-		printf(" %u == wave.Subchunk2Size, ", ioWave.pcm.Subchunk2Size);
-		break;
-	default:
 		printf(" %u == wave.ExtraParamSize, ", ioWave.ExtraParamSize);
+		return -1;
 	}
 	return 0;
 }
@@ -63,7 +65,7 @@ IoRet headerRIFF(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	printf(" %u == buffSz, ", ioRiff.chunkSz);
 	printf("0x%x == format", ioRiff.format);
 	switch(ioRiff.format) {
-	case 'EVAW':	//'WAVE'
+	case riffFormatWAVE:	/*'WAVE'*/
 		ioRet = headerWAVE(io, inputSz, &ioRiff, inputBuff);
 	break;
 	default:
@@ -75,12 +77,16 @@ IoRet headerRIFF(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 		ioRet = fread(*inputBuff, inputSz, 1, io);
 	}
 	if(-1 == ioRet) {
-		printf("\n-1 == fread(buffer, %u, 1, %p)\n", inputSz, io);
+		printf("\n-1 == fread(inputBuff, %u, 1, %p)\n", inputSz, io);
 		free(*inputBuff);
 		*inputBuff = NULL;
 		return -1;
 	}
 	return 0;
+}
+IoRet headerRIFX(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
+	printf(" == 'RIFX'; Microsoft RIFX big-endian, TODO.\n");
+	return -1;
 }
 IoRet main(int argc, char **argv) {
 	if(2 != argc) {
@@ -117,8 +123,11 @@ IoRet main(int argc, char **argv) {
 	}
 	printf(", 0x%x == inputHead", inputHead);
 	switch(inputHead) {
-	case 'FFIR':	//'RIFF'
+	case ioHeaderRIFF:	/*'RIFF'*/
 		headerRIFF(io, inputSz, &inputBuff);
+	break;
+	case ioHeaderRIFX:	/*'RIFX'*/
+		headerRIFX(io, inputSz, &inputBuff);
 	break;
 	default:
 		printf("; unknown.\n");
