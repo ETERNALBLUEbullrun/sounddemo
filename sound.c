@@ -1,6 +1,7 @@
 #include <stdio.h> /*size_t FILE fopen fclose fseek ftell fread*/
 #include <stdlib.h> /*malloc free*/
 #include <ctype.h> /*uint16_t uint32_t*/
+#include <limits.h> /*CHAR_BIT*/
 #include "sound.h" /*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
 /*static char *input = "input.wav";*/
 IoSz ioSz(FILE *io) {
@@ -41,6 +42,11 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 	printf(", %u == wave.bytePs", ioWave.bytePs);
 	printf(", %u == wave.blockAlign", ioWave.blockAlign);
 	printf(", %u == wave.bitsPerSample", ioWave.bitsPerSample);
+	const IoSz bitPs = ioWave.numChannels * ioWave.samplePs * ioWave.bitsPerSample / CHAR_BIT;
+	if(bitPs !=  ioWave.bytePs) {
+		printf("\nError: bitPs == %u != wave.bytePs * CHAR_BIT.\n", bitPs);
+		return -1;
+	}
 	printf(", %u == wave.audioFormat", ioWave.audioFormat);
 	switch(ioWave.audioFormat) {
 	case microsoftAudioPcm:
