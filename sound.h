@@ -15,7 +15,10 @@ typedef enum IoHeader : uint32_t {
 	ioHeaderRifx = 'RIFX'		/*'RIFX' big-endian*/
 } IoHeader;
 typedef enum RiffFormat : uint32_t {
-	riffFormatWave = 'EVAW'		/*'WAVE'*/
+	riffFormatWave = 'EVAW',	/*'WAVE'*/
+	riffFormatList = 'TSIL',	/*'LIST'*/
+	riffFormatIsft = 'fvaL',	/*'Lavf'*/
+	riffFormatJunk = 0		/*''*/
 } RiffFormat;
 typedef struct MicrosoftRiff {
 	IoHeader header;		/*'RIFF'*/
@@ -26,8 +29,11 @@ typedef enum SubchunkId : uint32_t {
 	subchunkIdWave = ' tmf',	/*'fmt '*/
 	subchunkIdPcm = 'atad'		/*'data'*/
 } SubchunkId;
-typedef enum SubchunkSize : uint32_t {
-	subchunkSzPcm = 16
+typedef enum SubchunkSz : uint32_t {
+	subchunkSzPcm = 16,
+	subchunkSzList = 18,
+	subchunkSzIsft = 12,
+	subchunkSzJunk = 1016
 } SubchunkSz;
 typedef enum MicrosoftAudio : uint16_t {
 	microsoftAudioPcm = 1
@@ -50,6 +56,13 @@ typedef struct MicrosoftWave {
 		MicrosoftPcm pcm;
 	};
 } MicrosoftWave;
+typedef struct MicrosoftRiffList {
+	SubchunkId subchunk2Id;		/*'LIST'*/
+	SubchunkSz subchunk2Sz;	/*18*/
+	SubchunkId subchunk1Id;		/*'fmt '*/
+	SubchunkSz subchunk1Sz;
+	MicrosoftAudio audioFormat;
+} MicrosoftRiffList;
 IoSz ioSz(FILE *io);
 IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
 IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
