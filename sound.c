@@ -1,9 +1,8 @@
-#include <stdio.h> /*size_t FILE fopen fclose fseek ftell fread*/
-#include <stdlib.h> /*malloc free*/
-#include <ctype.h> /*uint16_t uint32_t*/
-#include <limits.h> /*CHAR_BIT*/
-#include "sound.h" /*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
-/*static char *input = "input.wav";*/
+#include <stdio.h>	/*size_t FILE fopen fclose fseek ftell fread*/
+#include <stdlib.h>	/*malloc free*/
+#include <ctype.h>	/*uint16_t uint32_t*/
+#include <limits.h>	/*CHAR_BIT*/
+#include "sound.h"	/*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
 IoSz ioSz(FILE *io) {
 	fseek(io, 0L, SEEK_END);
 	IoSz inputSz = ftell(io);
@@ -12,7 +11,7 @@ IoSz ioSz(FILE *io) {
 }
 IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
 	printf(" %u == wave.subchunk2Sz, ", ioWave->pcm.subchunk2Sz);
-	if(subchunkSzPcm !=  ioWave->subchunk1Sz) {
+	if(subchunkSzPcm != ioWave->subchunk1Sz) {
 		printf("\n%u == wave.subchunk1Id, should == 16 for PCM.\n", ioWave->subchunk1Sz);
 		return -1;
 	}
@@ -31,7 +30,7 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 		printf("\n-1 == fread(&ioWave, sizeof(ioWave), 1, %p)\n", io);
 		return -1;
 	}
-	if(subchunkIdWave !=  ioWave.subchunk1Id) {
+	if(subchunkIdWave != ioWave.subchunk1Id) {
 		printf("\n%x == wave.subchunk1Id, should == 'fmt '.\n", ioWave.subchunk1Id);
 		return -1;
 	}
@@ -43,7 +42,7 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 	printf(", %u == wave.blockAlign", ioWave.blockAlign);
 	printf(", %u == wave.bitsPerSample", ioWave.bitsPerSample);
 	const IoSz bitPs = ioWave.numChannels * ioWave.samplePs * ioWave.bitsPerSample / CHAR_BIT;
-	if(bitPs !=  ioWave.bytePs) {
+	if(bitPs != ioWave.bytePs) {
 		printf("\nError: bitPs == %u != wave.bytePs * CHAR_BIT.\n", bitPs);
 		return -1;
 	}
@@ -95,6 +94,7 @@ IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	return -1;
 }
 IoRet main(int argc, char **argv) {
+	char *input = NULL;
 	if(2 != argc) {
 		printf("Should '%s input.wav'. Input audio: ", argv[0]);
 		size_t inputSz = 0;

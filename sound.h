@@ -4,9 +4,8 @@
  * and would go on to construct sound/audio,
  * but failed to parse small sample .wav inputs,
  * so must wav format was misunderstood somehow.*/
-#include <stdio.h> /*size_t FILE*/
-#include <ctype.h> /*uint16_t uint32_t*/
-static char *input;
+#include <stdio.h>	/*size_t FILE*/
+#include <ctype.h>	/*uint16_t uint32_t*/
 typedef unsigned IoSz;
 typedef int IoRet;
 typedef uint32_t IoHead;
@@ -18,12 +17,12 @@ typedef enum RiffFormat : uint32_t {
 	riffFormatWave = 'EVAW',	/*'WAVE'*/
 	riffFormatList = 'TSIL',	/*'LIST'*/
 	riffFormatIsft = 'fvaL',	/*'Lavf'*/
-	riffFormatJunk = 0		/*''*/
+	riffFormatJunk = 0			/*''*/
 } RiffFormat;
 typedef struct MicrosoftRiff {
-	IoHeader header;		/*'RIFF'*/
+	IoHeader header;			/*'RIFF'*/
 	uint32_t chunkSz;
-	RiffFormat format;		/*'WAVE'*/
+	RiffFormat format;			/*'WAVE'*/
 } MicrosoftRiff;
 typedef enum SubchunkId : uint32_t {
 	subchunkIdWave = ' tmf',	/*'fmt '*/
@@ -58,7 +57,7 @@ typedef struct MicrosoftWave {
 } MicrosoftWave;
 typedef struct MicrosoftRiffList {
 	SubchunkId subchunk2Id;		/*'LIST'*/
-	SubchunkSz subchunk2Sz;	/*18*/
+	SubchunkSz subchunk2Sz;		/*18*/
 	SubchunkId subchunk1Id;		/*'fmt '*/
 	SubchunkSz subchunk1Sz;
 	MicrosoftAudio audioFormat;
