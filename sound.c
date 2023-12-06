@@ -3,13 +3,13 @@
 #include <ctype.h>	/*uint16_t uint32_t*/
 #include <limits.h>	/*CHAR_BIT*/
 #include "sound.h"	/*IoSz IoRet IoHead IoHeader RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave ioSz headerPcm headerWave headerRiff headerRifx*/
-IoSz ioSz(FILE *io) {
+const IoSz ioSz(FILE *io) {
 	fseek(io, 0L, SEEK_END);
 	IoSz inputSz = ftell(io);
 	fseek(io, 0L, SEEK_SET);
 	return inputSz;
 }
-IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
+const IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff) {
 	printf(" %u == wave.subchunk2Sz, ", ioWave->pcm.subchunk2Sz);
 	if(subchunkSzPcm != ioWave->subchunk1Sz) {
 		printf("\n%u == wave.subchunk1Id, should == 16 for PCM.\n", ioWave->subchunk1Sz);
@@ -21,7 +21,7 @@ IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **i
 	}
 	return 0;
 }
-IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff) {
+const IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff) {
 	printf(" == 'WAVE'; Microsoft (WAV) sound.\n");
 	MicrosoftWave ioWave;
 	IoRet ioRet;
@@ -58,7 +58,7 @@ IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **
 	}
 	return 0;
 }
-IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
+const IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	printf(" == 'RIFF'; Microsoft RIFF.");
 	MicrosoftRiff ioRiff;
 	IoRet ioRet;
@@ -89,11 +89,11 @@ IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	}
 	return 0;
 }
-IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
+const IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff) {
 	printf(" == 'RIFX'; Microsoft RIFX big-endian, TODO.\n");
 	return -1;
 }
-IoRet main(int argc, char **argv) {
+const IoRet main(int argc, char **argv) {
 	char *input = NULL;
 	if(2 != argc) {
 		printf("Should '%s input.wav'. Input audio: ", argv[0]);

@@ -62,10 +62,10 @@ typedef struct MicrosoftRiffList {
 	SubchunkSz subchunk1Sz;
 	MicrosoftAudio audioFormat;
 } MicrosoftRiffList;
-IoSz ioSz(FILE *io);
-IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
-IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
-IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff);
-IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff);
-IoRet main(int argc, char **argv);
+const IoSz ioSz(FILE *io);
+const IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
+const IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
+const IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff);
+const IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff);
+const IoRet main(int argc, char **argv);
 
