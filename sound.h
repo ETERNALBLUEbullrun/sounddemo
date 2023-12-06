@@ -6,9 +6,7 @@
  * so must wav format was misunderstood somehow.*/
 #include <stdio.h>	/*size_t FILE*/
 #include <ctype.h>	/*uint16_t uint32_t*/
-typedef unsigned IoSz;
-typedef int IoRet;
-typedef uint32_t IoHead;
+#include "io.h"		/*IoSz IoRet Io IoHead*/
 typedef enum IoHeader : uint32_t {
 	ioHeaderRiff = 'FFIR',		/*'RIFF'*/
 	ioHeaderRifx = 'RIFX'		/*'RIFX' big-endian*/
@@ -37,11 +35,12 @@ typedef enum SubchunkSz : uint32_t {
 typedef enum MicrosoftAudio : uint16_t {
 	microsoftAudioPcm = 1
 } MicrosoftAudio;
-typedef struct MicrosoftPcm {
+typedef struct MicrosoftPcm_ {
 	SubchunkId subchunk2Id;		/*'data'*/
 	SubchunkSz subchunk2Sz;
-} MicrosoftPcm;
+} MicrosoftPcm_;
 typedef struct MicrosoftWave {
+	MicrosoftRiff riff;
 	SubchunkId subchunk1Id;		/*'fmt '*/
 	SubchunkSz subchunk1Sz;
 	MicrosoftAudio audioFormat;
@@ -52,9 +51,14 @@ typedef struct MicrosoftWave {
 	uint16_t bitsPerSample;
 	union {
 		uint16_t extraParamSz;	/*+ char [ExtraParamSz]ExtraParams, not for PCM*/
-		MicrosoftPcm pcm;
+		MicrosoftPcm_ pcm;
 	};
 } MicrosoftWave;
+typedef struct MicrosoftPcm {
+	MicrosoftWave wave;
+	SubchunkId subchunk2Id;		/*'data'*/
+	SubchunkSz subchunk2Sz;
+} MicrosoftPcm;
 typedef struct MicrosoftRiffList {
 	SubchunkId subchunk2Id;		/*'LIST'*/
 	SubchunkSz subchunk2Sz;		/*18*/
@@ -62,10 +66,9 @@ typedef struct MicrosoftRiffList {
 	SubchunkSz subchunk1Sz;
 	MicrosoftAudio audioFormat;
 } MicrosoftRiffList;
-const IoSz ioSz(FILE *io);
-const IoRet headerPcm(FILE *io, IoSz inputSz, const MicrosoftWave *ioWave, uint8_t **inputBuff);
-const IoRet headerWave(FILE *io, IoSz inputSz, const MicrosoftRiff *ioRiff, uint8_t **inputBuff);
-const IoRet headerRiff(FILE *io, IoSz inputSz, uint8_t **inputBuff);
-const IoRet headerRifx(FILE *io, IoSz inputSz, uint8_t **inputBuff);
+const IoRet headerPcm(Io *io);
+const IoRet headerWave(Io *io);
+const IoRet headerRiff(Io *io);
+const IoRet headerRifx(Io *io);
 const IoRet main(int argc, char **argv);
 
