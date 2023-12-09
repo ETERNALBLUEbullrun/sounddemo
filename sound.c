@@ -5,7 +5,7 @@
 #include <limits.h>	/*CHAR_BIT*/
 #include "sound.h"	/*RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave
 *					  headerPcm headerWave headerRiff headerRifx*/
-#include "io.h"		/*IO_CAST_TO Io IoSz IoRet IoHead IoHeader ioTest ioOpen ioClose ioToBuff*/
+#include "io.h"		/*IO_CAST_TO Io IoSz IoRet IoHead IoHeader ioTest ioLoad ioUnload ioToBuff*/
 const IoRet headerPcm(Io *io) {
 	const MicrosoftWave *ioWave = *io->buff;
 	printf(" (%u == MicrosoftWave.subchunk2Sz), ", ioWave->pcm.subchunk2Sz);
@@ -114,9 +114,9 @@ const IoRet main(int argc, char **argv) {
 		input = argv[1];
 	}
 	printf("input: \"%s\"", input);
-	ioRet = ioOpen(&io, input, "ro");
+	ioRet = ioLoad(&io, input, "ro");
 	if(0 > ioRet) {
-		printf("\nError: (%i == ioOpen(%p, \"%s\", \"ro\"))\n", ioRet, &io, input);
+		printf("\nError: (%i == ioLoad(%p, \"%s\", \"ro\"))\n", ioRet, &io, input);
 		goto exit;
 	}
 	printf(", %u == sz", io.ioSz);
@@ -148,7 +148,7 @@ exit:
 	if(inputMalloc) {
 		free(input);
 	}
-	ioClose(&io);
+	ioUnload(&io);
 	return ioRet;
 }
 

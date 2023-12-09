@@ -22,8 +22,8 @@ typedef struct Io {
 typedef uint32_t IoHead;	/*PE/ELF "magic word"/file-type/head*/
 const IoSz ioSz(FILE *io);
 void ioSetBuf(Io *io, void *buff, IoSz buffSz);
-const IoRet ioOpen(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/);
-void ioClose(Io *io);
+const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/);
+void ioUnload(Io *io);
 const IoRet ioToBuff(Io *io, IoSz rSz, long offset /*= 0L*/, int whence /*= SEEK_CUR*/);
 const IoRet ioFromBuff(Io *io, IoSz wSz, long offset /*= 0L*/, int whence /*= SEEK_CUR*/);
 const IoRet ioTest(const char *restrict fPath);

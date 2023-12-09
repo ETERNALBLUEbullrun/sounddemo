@@ -1,7 +1,7 @@
 #include <stdio.h>	/*FILE fopen fclose fseek ftell fread fwrite*/
 #include <stdlib.h>	/*realloc free*/
 #include "io.h"	/*Io IoSz IoRet IoHead IoHeader
-*					  ioSz ioOpen ioClose ioToBuff ioFromBuff*/
+*					  ioSz ioLoad ioUnload ioToBuff ioFromBuff*/
 const IoSz ioSz(FILE *io) {
 	fseek(io, 0L, SEEK_END);
 	IoSz inputSz = ftell(io);
@@ -14,7 +14,7 @@ void ioSetBuff(Io *io, void *buff, IoSz buffSz) {
 	io->buffSz = buffSz;
 	io->buffMax = buffSz;
 }
-const IoRet ioOpen(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/) {
+const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/) {
 	ioSetBuff(io, NULL, 0);
 	io->io = fopen(fPath, mode);
 	if(NULL == io->io) {
@@ -25,7 +25,7 @@ const IoRet ioOpen(Io *io, const char *restrict fPath, const char *restrict mode
 	io->ioSz = ioSz(io->io);
 	return 0;
 }
-/*const IoRet*/void ioClose(Io *io) {
+/*const IoRet*/void ioUnload(Io *io) {
 	/*IoRet ioRet = 0;*/
 	if(NULL != io->buff_) {
 		free(io->buff_);
@@ -87,14 +87,14 @@ const IoRet ioTest(const char *fPath) {
 	int fromBuff = 'UwUs';
 	int *toBuff = NULL;
 	IoSz fromBuffSz = sizeof(fromBuff);
-	ioRet = ioOpen(&io, fPath, "a+");
+	ioRet = ioLoad(&io, fPath, "a+");
 	if(0 < io.ioSz) {
 		printf("\nError: ioTest(\"%s\"), but \"%s\" found (0 < io.ioSz)\n", fPath, fPath);
-		ioClose(&io);
+		ioUnload(&io);
 		return ioRet;
 	}
 	if(0 > ioRet) {
-		printf("\nError: (%i == ioOpen(%p, %s, %s))\n", ioRet, &io, fPath, "a+");
+		printf("\nError: (%i == ioLoad(%p, %s, %s))\n", ioRet, &io, fPath, "a+");
 		goto exit;
 	}
 	ioSetBuff(&io, &fromBuff, fromBuffSz);
@@ -119,17 +119,17 @@ const IoRet ioTest(const char *fPath) {
 		goto exit;
 	}
 exit:
-	ioClose(&io);
-	ioRet = ioOpen(&io, fPath, "w");
+	ioUnload(&io);
+	ioRet = ioLoad(&io, fPath, "w");
 	if(0 > ioRet) {
-		printf("\nError: (%i == ioOpen(%p, %s, %s))\n", ioRet, &io, fPath, "w");
+		printf("\nError: (%i == ioLoad(%p, %s, %s))\n", ioRet, &io, fPath, "w");
 		return ioRet;
 	}
 	if(0 < io.ioSz) {
 		printf("\nError: (%p == fopen(\"%s\",\"w\")) but (0 < io.ioSz)\n", io.io, fPath);
 		ioRet = -1;
 	}
-	ioClose(&io);
+	ioUnload(&io);
 	return ioRet;
 }
 
