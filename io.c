@@ -88,14 +88,14 @@ const IoRet ioTest(const char *fPath) {
 	int *toBuff = NULL;
 	IoSz fromBuffSz = sizeof(fromBuff);
 	ioRet = ioLoad(&io, fPath, "a+");
-	if(0 < io.ioSz) {
-		printf("\nError: ioTest(\"%s\"), but \"%s\" found (0 < io.ioSz)\n", fPath, fPath);
-		ioUnload(&io);
-		return ioRet;
-	}
 	if(0 > ioRet) {
 		printf("\nError: (%i == ioLoad(%p, %s, %s))\n", ioRet, &io, fPath, "a+");
 		goto exit;
+	}
+	if(0 < io.ioSz) {
+		printf("\nError: ioTest(\"%s\"), but \"%s\" exists (%u == io.ioSz)\n", fPath, fPath, io.ioSz);
+		ioUnload(&io);
+		return ioRet;
 	}
 	ioSetBuff(&io, &fromBuff, fromBuffSz);
 	ioRet = ioFromBuff(&io, io.buffSz, 0, SEEK_SET);
