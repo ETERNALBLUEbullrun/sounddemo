@@ -3,9 +3,9 @@
 #include <errno.h>	/*errno*/
 #include <ctype.h>	/*uint16_t uint32_t*/
 #include <limits.h>	/*CHAR_BIT*/
-#include "sound.h"	/*RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave
-*					  headerPcm headerWave headerRiff headerRifx*/
-#include "io.h"		/*IO_CAST_TO Io IoSz IoRet IoHead IoHeader ioTest ioLoad ioUnload ioToBuff*/
+#include "sound.h"	/*headerPcm headerWave headerRiff headerRifx*/
+#include "MsRiff.h"	/*RiffFormat MicrosoftRiff SubchunkId SubchunkSz MicrosoftPcm MicrosoftWave MsHead MsHeader*/
+#include "io.h"		/*IO_CAST_TO Io IoSz IoRet ioTest ioLoad ioUnload ioToBuff*/
 const IoRet headerPcm(Io *io) {
 	const MicrosoftWave *ioWave = *io->buff;
 	IoRet ioRet = 0;
@@ -93,7 +93,7 @@ const IoRet headerRifx(Io *io) {
 	return -1;
 }
 const IoRet main(int argc, char **argv) {
-	const IoHead *inputHead = NULL;
+	const MsHead *msHead = NULL;
 	const bool inputMalloc = (2 != argc);
 	char *input = NULL;
 	Io io;
@@ -114,25 +114,25 @@ const IoRet main(int argc, char **argv) {
 	} else {
 		input = argv[1];
 	}
-	printf("input: \"%s\"", input);
+	printf("(\"%s\" == fPath)", input);
 	ioRet = ioLoad(&io, input, "ro");
 	if(0 > ioRet) {
 		printf("\nError: (%i == ioLoad(%p, \"%s\", \"ro\"))\n", ioRet, &io, input);
 		goto exit;
 	}
-	printf(", %u == sz", io.ioSz);
-	ioRet = ioToBuff(&io, sizeof(*inputHead), 0L, SEEK_SET);
-	inputHead = *io.buff;
+	printf(", (%u == fPath.sz)", io.ioSz);
+	ioRet = ioToBuff(&io, sizeof(*msHead), 0L, SEEK_SET);
+	msHead = *io.buff;
 	if(0 > ioRet) {
-		printf("\nError: (%i == ioToBuff(%p, sizeof(*inputHead), 0L, SEEK_SET))\n", ioRet, &io);
+		printf("\nError: (%i == ioToBuff(%p, sizeof(*msHead), 0L, SEEK_SET))\n", ioRet, &io);
 		goto exit;
 	}
-	printf(", (0x%x == inputHead)", *inputHead);
-	switch(*inputHead) {
-	case ioHeaderRiff:	/*'RIFF'*/
+	printf(", (0x%x == fPath.head)", *msHead);
+	switch(*msHead) {
+	case msHeaderRiff:	/*'RIFF'*/
 		ioRet = headerRiff(&io);
 	break;
-	case ioHeaderRifx:	/*'RIFX'*/
+	case msHeaderRifx:	/*'RIFX'*/
 		ioRet = headerRifx(&io);
 	break;
 	default:
