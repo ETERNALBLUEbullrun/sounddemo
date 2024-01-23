@@ -77,7 +77,7 @@ const IoRet ioFromBuff(Io *io, IoSz wSz, long offset /*= 0L*/, int whence /*= SE
 		return -2;
 	}
 	if(wSz > io->buffSz) {
-		printf("\nError: (ioToBuff(%p, %u, %lu, %i)) but (%u == *%p->buffSz)\n", io, wSz, offset, whence, io->buffSz, io);
+		printf("\nError: (ioFromBuff(%p, %u, %lu, %i)) but (%u == *%p->buffSz)\n", io, wSz, offset, whence, io->buffSz, io);
 		return -2;
 	}
 	fseek(io->io, offset, whence);
