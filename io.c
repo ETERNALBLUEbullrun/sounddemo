@@ -35,17 +35,15 @@ const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode
 	/*IoRet ioRet = 0;*/
 	if(NULL != io->buff_) {
 		free(io->buff_);
-		io->buff_ = NULL;
-	}
-	if(NULL != io->buff && NULL != *io->buff) {
+	} else if(NULL != io->buff && NULL != *io->buff) {
 		free(*io->buff);
 	}
-	io->buff = NULL;
 	if(0 < io->io) {
 		fclose(io->io);
 	}/* else {
 		ioRet = -1;
 	}*/
+	ioSetBuff(io, NULL, 0);
 	io->io = 0;
 	/*return ioRet;*/
 }
