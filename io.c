@@ -1,20 +1,25 @@
 #include <stdio.h>	/*FILE fopen fclose fseek ftell fread fwrite*/
 #include <stdlib.h>	/*realloc free*/
-#include "io.h"	/*Io IoSz IoRet IoHead IoHeader
+#include <assert.h>	/*rassert*/
+#include "io.h"		/*Io IoSz IoRet IoHead IoHeader
 *					  ioSz ioLoad ioUnload ioToBuff ioFromBuff*/
 const IoSz ioSz(FILE *io) {
+	assert(NULL != io);
 	fseek(io, 0L, SEEK_END);
 	IoSz inputSz = ftell(io);
 	fseek(io, 0L, SEEK_SET);
 	return inputSz;
 }
 void ioSetBuff(Io *io, void *buff, IoSz buffSz) {
+	assert(NULL != io);
+	assert(NULL != buff || 0 == buffSz);
 	io->buff_ = buff;
 	io->buff = &io->buff_;
 	io->buffSz = buffSz;
 	io->buffMax = buffSz;
 }
 const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/) {
+	assert(NULL != io);
 	ioSetBuff(io, NULL, 0);
 	io->io = fopen(fPath, mode);
 	if(NULL == io->io) {
@@ -26,6 +31,7 @@ const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode
 	return 0;
 }
 /*const IoRet*/void ioUnload(Io *io) {
+	assert(NULL != io);
 	/*IoRet ioRet = 0;*/
 	if(NULL != io->buff_) {
 		free(io->buff_);
@@ -44,6 +50,7 @@ const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode
 	/*return ioRet;*/
 }
 const IoRet ioToBuff(Io *io, IoSz rSz, long offset /*= 0L*/, int whence /*= SEEK_CUR*/) {
+	assert(NULL != io);
 	void *buff = realloc(*io->buff, rSz);
 	if(NULL == buff) {
 		printf("\nError: (NULL == realloc(%p, %u))\n", *io->buff, rSz);
@@ -60,6 +67,7 @@ const IoRet ioToBuff(Io *io, IoSz rSz, long offset /*= 0L*/, int whence /*= SEEK
 	return 0;
 }
 const IoRet ioFromBuff(Io *io, IoSz wSz, long offset /*= 0L*/, int whence /*= SEEK_CUR*/) {
+	assert(NULL != io);
 	const void *buff = io->buff_;
 	if(NULL != io->buff && NULL != *io->buff) {
 		buff = *io->buff;

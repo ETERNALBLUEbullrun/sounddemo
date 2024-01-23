@@ -20,6 +20,9 @@ typedef struct Io {
 } Io;
 #define IO_CAST_TO(io, CAST_TO) ((CAST_TO)(*(io)->buff))
 typedef uint32_t IoHead;	/*PE/ELF "magic word"/file-type/head*/
+
+/*Throws/asserts: all functions run "assert(NULL != io);
+ * ioSetBuff runs "assert(NULL != buff || 0 == buffSz*/
 const IoSz ioSz(FILE *io);
 void ioSetBuff(Io *io, void *buff, IoSz buffSz);
 const IoRet ioLoad(Io *io, const char *restrict fPath, const char *restrict mode /*= "ro"*/);
